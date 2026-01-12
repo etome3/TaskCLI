@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,8 +15,12 @@ type Task struct {
 	Added time.Time `json:"added"`
 }
 
-var dataDir = "data"
-var dataFile = filepath.Join(dataDir, "tasks.json")
+const (
+	dataDir      = "data"
+	dataFileName = "tasks.json"
+)
+
+var dataFile = filepath.Join(dataDir, dataFileName)
 
 var root = cli.Command{
 	Name:  "TaskCLI",
@@ -31,48 +33,9 @@ var root = cli.Command{
 }
 
 func Run() {
+	initData()
 	err := root.Run(context.Background(), os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func init() {
-	err := os.MkdirAll(dataDir, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	file, err := os.OpenFile(dataFile, os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		fmt.Println("Error opening or creating file:", err)
-	}
-	defer file.Close()
-}
-
-func writeJson(tasks []Task) error {
-	output, err := json.MarshalIndent(&tasks, "", "  ")
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(dataFile, output, 0777)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func openJson() ([]Task, error) {
-	data, err := os.ReadFile(dataFile)
-	if err != nil {
-		return nil, err
-	}
-	if len(data) == 0 {
-		data = []byte("[]")
-	}
-	var tasks []Task
-	err = json.Unmarshal(data, &tasks)
-	if err != nil {
-		return nil, err
-	}
-	return tasks, nil
 }

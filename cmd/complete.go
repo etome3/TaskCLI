@@ -24,7 +24,7 @@ var CompleteCmd = cli.Command{
 
 func Complete(ctx context.Context, c *cli.Command) error {
 	taskName := strings.Join(c.StringArgs("completedTask"), " ")
-	tasks, err := openJson()
+	tasks, err := readJson(dataFile)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func Complete(ctx context.Context, c *cli.Command) error {
 			newTasks = append(newTasks, task)
 		}
 	}
-	err = writeJson(newTasks)
+	err = writeJson(dataFile, newTasks)
 	if err != nil {
 		return err
 	}

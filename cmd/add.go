@@ -29,12 +29,12 @@ func Add(ctx context.Context, c *cli.Command) error {
 		Name:  taskName,
 		Added: time.Now(),
 	}
-	tasks, err := openJson()
+	tasks, err := readJson(dataFile)
 	if err != nil {
 		return err
 	}
 	tasks = append(tasks, task)
-	err = writeJson(tasks)
+	err = writeJson(dataFile, tasks)
 	if err != nil {
 		return err
 	}

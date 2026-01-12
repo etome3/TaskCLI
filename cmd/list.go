@@ -15,7 +15,7 @@ var ListCmd = cli.Command{
 }
 
 func List(ctx context.Context, c *cli.Command) error {
-	tasks, err := openJson()
+	tasks, err := readJson(dataFile)
 	if err != nil {
 		return err
 	}
