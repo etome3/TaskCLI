@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -24,6 +25,8 @@ var root = cli.Command{
 	Usage: "A CLI application for managing tasks",
 	Commands: []*cli.Command{
 		&AddCmd,
+		&CompleteCmd,
+		&ListCmd,
 	},
 }
 
@@ -44,4 +47,32 @@ func init() {
 		fmt.Println("Error opening or creating file:", err)
 	}
 	defer file.Close()
+}
+
+func writeJson(tasks []Task) error {
+	output, err := json.MarshalIndent(&tasks, "", "  ")
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(dataFile, output, 0777)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func openJson() ([]Task, error) {
+	data, err := os.ReadFile(dataFile)
+	if err != nil {
+		return nil, err
+	}
+	if len(data) == 0 {
+		data = []byte("[]")
+	}
+	var tasks []Task
+	err = json.Unmarshal(data, &tasks)
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }
